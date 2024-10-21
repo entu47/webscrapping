@@ -1,13 +1,20 @@
 from fastapi import FastAPI
-from serializer import ScrapeRequest
-from simple_scrapping import scrape_contents
-
+from scrape.router import scrape_router
+from motor.motor_asyncio import AsyncIOMotorClient
+import asyncio
 app = FastAPI()
+app.include_router(scrape_router)
+
+mongo_db_client: AsyncIOMotorClient = None
 
 
-@app.post("/scrape-url")
-async def get_details(request_body: ScrapeRequest):
-    request_url = request_body.url
-    limit = request_body.limit
-    scrape_contents(request_url, limit)
-    return {"success": True}
+@app.on_event("startup")
+async def startup_db():
+    global mongo_db_client
+    mongo_db_client = AsyncIOMotorClient("mongodb://localhost:27017")
+
+
+@app.on_event("shutdown")
+async def shutdown_db():
+    global mongo_db_client
+    mongo_db_client.close()
