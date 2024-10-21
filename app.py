@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from scrape.router import scrape_router
 from motor.motor_asyncio import AsyncIOMotorClient
-import asyncio
+
+
 app = FastAPI()
 app.include_router(scrape_router)
 
