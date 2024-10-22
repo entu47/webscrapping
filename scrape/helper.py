@@ -4,6 +4,7 @@ from app import mongo_db_client
 import logging
 from common.db_manager import BaseCacheManager
 from common.db_manager import BaseDBManager
+from scrape.serializer import ScrapeDBItemSchema
 
 logger = logging.getLogger(__name__)
 
@@ -14,19 +15,21 @@ class RedisCacheManager(BaseCacheManager):
         self.client = client
 
     def create_entry(self, payload):
-        key = f"product|{payload['id']}"
-        value = payload['price']
-        entry = {key: value}
-        return entry
+        transformed_payload = dict()
+        for each_entry in payload:
+            key = f"product|{each_entry['id']}"
+            value = each_entry['price']
+            transformed_payload.update({key: value})
+        return transformed_payload
 
-    def get_entry(self, **kwargs):
-        key = kwargs['key']
-        return self.client.get(key)
+    def get_entries(self, **kwargs):
+        keys = kwargs['keys']
+        return self.client.mget(keys)
 
     def set_entry(self, **kwargs):
-        key = kwargs['key']
-        value = kwargs['value']
-        raise self.client.set(key, value)
+        entries = kwargs['entries']
+        mapping = self.create_entry(entries)
+        raise self.client.mset(mapping)
 
 
 class MongoDBManager(BaseDBManager):
@@ -45,8 +48,17 @@ class MongoDBManager(BaseDBManager):
     def find_entries(self, **kwargs) -> str:
         pass
 
+    def transform_payload(self, payload):
+        transformed_payload = list()
+        for each_item in payload:
+            transformed_item = ScrapeDBItemSchema().load(each_item)
+            transformed_payload.append(transformed_item)
+        return transformed_payload
+
+
     async def bulk_update_entries(self, **kwargs) -> str:
         entries = kwargs['entries']
+        entries = self.transform_payload(entries)
         bulk_operations = list()
         for entry in entries:
             query = entry["filter"]
@@ -61,19 +73,14 @@ class MongoDBManager(BaseDBManager):
             logger.exception(bwe)
 
 
-async def update_scrape_details_in_db(products):
-    bulk_operations = []
-    db_client = mongo_db_client.firebolt
-    collection = db_client.products
-    for entry in products:
-        query = entry["filter"]
-        update = {"$set": entry["update"]}
+class ScrapeStorage:
+    def __init__(self, db_client, cache_client):
+        self.db_manager = MongoDBManager(db_client)
+        self.cache_manager = RedisCacheManager(cache_client)
 
-        bulk_operation = UpdateMany(query, update, upsert=True)
-        bulk_operations.append(bulk_operation)
+    async def preprocess_data(self, payload):
+        pass
 
-    try:
-        result = await collection.bulk_write(bulk_operations)
-    except BulkWriteError as bwe:
-        logger.exception(bwe)
-
+    async def trigger_storage_pipeline(self, payload):
+        await self.db_manager.bulk_update_entries(entries=payload)
+        self.cache_manager.set_entry(entries=payload)

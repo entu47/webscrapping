@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from scrape.serializer import ScrapeDBItemSchema
+
 
 class BaseCacheManager(ABC):
     def __init__(self, client):
@@ -24,6 +26,10 @@ class BaseDBManager(ABC):
 
     @abstractmethod
     async def create_entry(self, payload) -> object:
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_payload(self, payload):
         raise NotImplementedError
 
     @abstractmethod
