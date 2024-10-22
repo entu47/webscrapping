@@ -15,3 +15,9 @@ class ErrorResponseSchema(Schema):
 class FailureResponseSchema(Schema):
     success = fields.Boolean(required=True)
     error = fields.List(fields.Nested(ErrorResponseSchema), required=True)
+
+
+class ScrapeDBItemSchema(Schema):
+    price = fields.Integer(required=True)
+    title = fields.Integer(required=True)
+    local_path = fields.String(required=True)
