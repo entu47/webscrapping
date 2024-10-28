@@ -2,7 +2,7 @@ import logging
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from marshmallow import ValidationError
-from scrape.action import scrape_contents
+from scrape.action import SrapeDataHunter
 from scrape.serializer import ScrapeRequestSchema, FailureResponseSchema
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class ScrapeView:
         request_body = await request.json()
         try:
             request_data = ScrapeRequestSchema().load(request_body)
-            response = scrape_contents(request_data)
+            response = await SrapeDataHunter().scrape_contents(request_data)
         except ValidationError as e:
             # Preparing failure response for validation error
             logger.info({"message": "ValidationError", "exception": e})

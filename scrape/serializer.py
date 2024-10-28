@@ -19,5 +19,6 @@ class FailureResponseSchema(Schema):
 
 class ScrapeDBItemSchema(Schema):
     price = fields.Integer(required=True)
-    title = fields.Integer(required=True)
-    local_path = fields.String(required=True)
+    title = fields.String(required=True)
+    image_path = fields.String(required=True)
+    id = fields.Integer(required=True)
