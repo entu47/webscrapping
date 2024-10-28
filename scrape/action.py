@@ -12,10 +12,11 @@ from scrape.helper import ScrapeStorage
 class SrapeDataHunter:
 
     IMAGE_DIR = "images"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     def write_details(self, products):
-        file_name = './products.json'
-        with open(file_name, 'w') as outfile:
+        file_path = os.path.join(self.BASE_DIR, "product.json")
+        with open(file_path, 'w') as outfile:
             json.dump(products, outfile, indent=4)
 
     def download_image(self, image_url, image_path):
@@ -52,7 +53,7 @@ class SrapeDataHunter:
             price_tag = item.find('div', class_='price')
             product_unique_id = item.find('a').attrs['href'].split('-')[-1]
             image_url = link_tag
-            image_path = os.path.join(self.IMAGE_DIR, os.path.basename(image_url.split('/')[-1]))
+            image_path = os.path.join(self.BASE_DIR, self.IMAGE_DIR, os.path.basename(image_url.split('/')[-1]))
             self.download_image(image_url=link_tag, image_path=image_path)
             absolute_path = os.path.abspath(image_path)
             price = price_tag.contents[0].contents[0].replace("₹", "").strip().replace(',', '').strip()
@@ -70,8 +71,6 @@ class SrapeDataHunter:
             }
             db_products.append(product_detail_db)
         self.write_details(products)
-        # mongo_db_client = AsyncIOMotorClient("mongodb://localhost:27017")
-        # redis_db_client = redis.Redis.from_url('redis://localhost:6379')
         storage_class = ScrapeStorage(current_config.mongo_db_client, current_config.redis_db_client)
         storage_class.preprocess_data(db_products)
         await storage_class.trigger_storage_pipeline()
