@@ -1,13 +1,11 @@
 import json
 import os
-
-import redis
-# from app import mongo_db_client
-# from app import redis_db_client
+import httpx
+from httpx import RequestError, HTTPStatusError
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
+from config import current_config
 import requests
 from bs4 import BeautifulSoup
-from motor.motor_asyncio import AsyncIOMotorClient
-
 from scrape.helper import ScrapeStorage
 
 
@@ -30,8 +28,19 @@ class SrapeDataHunter:
         except requests.exceptions.RequestException as e:
             print(f"Failed to download image {image_url}: {e}")
 
+    @retry(
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((RequestError, HTTPStatusError))
+    )
+    async def fetch_page(self, url):
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, timeout=10)
+            response.raise_for_status()
+            return response
+
     async def scrape_contents(self, url, limit=10):
-        response = requests.get(url)
+        response = await self.fetch_page(url)
 
         soup = BeautifulSoup(response.content, 'html.parser')
         product_items = soup.find_all('div', class_='product-item',  limit=limit)
@@ -61,9 +70,9 @@ class SrapeDataHunter:
             }
             db_products.append(product_detail_db)
         self.write_details(products)
-        mongo_db_client = AsyncIOMotorClient("mongodb://localhost:27017")
-        redis_db_client = redis.Redis.from_url('redis://localhost:6379')
-        storage_class = ScrapeStorage(mongo_db_client, redis_db_client)
+        # mongo_db_client = AsyncIOMotorClient("mongodb://localhost:27017")
+        # redis_db_client = redis.Redis.from_url('redis://localhost:6379')
+        storage_class = ScrapeStorage(current_config.mongo_db_client, current_config.redis_db_client)
         storage_class.preprocess_data(db_products)
         await storage_class.trigger_storage_pipeline()
 
