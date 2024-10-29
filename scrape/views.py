@@ -14,7 +14,8 @@ authorized_clients = [(current_config.app_id, current_config.app_token)]
 class ScrapeView:
     @classmethod
     async def post(cls, request: Request):
-        response_data = {}
+        response_data = dict()
+        response_data["success"] = True
         request_body = await request.json()
         request_client_credentials = tuple(
             (request.headers.get("X-Application-ID"), request.headers.get("X-Application-Token")))
@@ -22,7 +23,7 @@ class ScrapeView:
             return JSONResponse({"success": False}, status_code=401)
         try:
             request_data = ScrapeRequestSchema().load(request_body)
-            response = await SrapeDataHunter().scrape_contents(request_data['url'], request_data['limit'])
+            scrape_response = await SrapeDataHunter().scrape_contents(request_data['url'], request_data['limit'])
         except ValidationError as e:
             logger.error({"message": "ValidationError", "exception": e})
             response_data["success"] = False
@@ -33,4 +34,5 @@ class ScrapeView:
             response_data["success"] = False
             return JSONResponse({"success": False}, status_code=400)
 
-        return JSONResponse({"success": True}, status_code=200)
+        response_data.update(scrape_response)
+        return JSONResponse(response_data, status_code=200)

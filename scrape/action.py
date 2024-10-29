@@ -54,8 +54,9 @@ class SrapeDataHunter:
 
     def notify_scrape_content(self):
         notification_class = ConsoleNotification()
-        message = f"products_scraped: {self.COUNT_PRODUCT_SCRAPED} products_updated: {self.COUNT_PRODUCTS_STORAGE}"
+        message = {"products_scraped": self.COUNT_PRODUCT_SCRAPED, "products_updated": self.COUNT_PRODUCTS_STORAGE}
         notification_class.notify(message)
+        return message
 
     async def scrape_contents(self, base_url, limit=10):
         products = list()
@@ -95,7 +96,8 @@ class SrapeDataHunter:
                 db_products.append(product_detail_db)
         self.write_details(products)
         await self.store_scrape_contents(db_products)
-        self.notify_scrape_content()
+        message = self.notify_scrape_content()
+        return message
 
 
 # Example usage

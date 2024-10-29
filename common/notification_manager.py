@@ -1,4 +1,6 @@
+import logging
 from abc import ABC, abstractmethod
+logger = logging.getLogger(__name__)
 
 
 class NotificationStrategy(ABC):
@@ -8,5 +10,5 @@ class NotificationStrategy(ABC):
 
 
 class ConsoleNotification(NotificationStrategy):
-    def notify(self, message: str):
-        print(message)
+    def notify(self, message: dict):
+        logger.info(message)
