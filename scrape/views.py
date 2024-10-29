@@ -2,7 +2,6 @@ import logging
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from marshmallow import ValidationError
-
 from config import current_config
 from scrape.action import SrapeDataHunter
 from scrape.serializer import ScrapeRequestSchema, FailureResponseSchema

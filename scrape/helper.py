@@ -1,4 +1,4 @@
-from pymongo import UpdateMany, UpdateOne
+from pymongo import UpdateOne
 from pymongo.errors import BulkWriteError
 import logging
 from common.db_manager import BaseCacheManager
@@ -76,6 +76,7 @@ class ScrapeStorage:
         self.db_manager = MongoDBManager(db_client)
         self.cache_manager = RedisCacheManager(cache_client)
         self.payload = []
+        self.products_updated = 0
 
     def preprocess_data(self, payload):
         payload_dict = {product["id"]: product for product in payload}
@@ -87,6 +88,8 @@ class ScrapeStorage:
             if product_in_db is not None:
                 if product_in_db['price'] == payload_dict[product_id]['price']:
                     payload_dict.pop(product_id)
+                else:
+                    self.products_updated += 1
         self.payload = payload_dict.values()
 
     async def trigger_storage_pipeline(self):
