@@ -2,7 +2,7 @@
 A FastAPI-based API for scraping content from websites, retrieving and storing data, and serving it through RESTful endpoints.
 
 ## **TABLE OF CONTENTS**
-* Overview
+* [Overview](#overview)
 * Technologies Used
 * Installation
 * Running The Application
