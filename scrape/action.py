@@ -61,7 +61,7 @@ class SrapeDataHunter:
     async def scrape_contents(self, base_url, limit=10):
         products = list()
         db_products = list()
-        for page_no in range(1, limit):
+        for page_no in range(1, limit+1):
             if page_no == 1:
                 url = base_url
             else:
