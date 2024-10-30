@@ -3,10 +3,10 @@ A FastAPI-based API for scraping content from websites, retrieving and storing d
 
 ## **TABLE OF CONTENTS**
 * [Overview](#overview)
-* Technologies Used
-* Installation
-* Running The Application
-* API Endpoints
+* [Technologies Used](#technologies-used)
+* [Installation](#installation)
+* [Running The Application](#running-the-application)
+* [API Endpoints](#api-endpoint)
 
 # **OVERVIEW**
 This API is built with FastAPI to scrape content from websites and store it database and cache. It allows clients to fetch data from specified websites and returns the information about scraped content. This API can be integrated with various applications or used as a standalone service for content retrieval and monitoring.
