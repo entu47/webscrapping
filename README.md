@@ -15,6 +15,8 @@ This API is built with FastAPI to scrape content from websites and store it data
 * FAST API
 * BEAUTIFUL SOUP
 * UVICORN
+* MONGODB
+* REDIS
 
 # **INSTALLATION**
 
@@ -37,8 +39,11 @@ This API is built with FastAPI to scrape content from websites and store it data
 uvicorn app:app
 
 # **API ENDPOINT**
-Endpoint        Method    Description
-/v1.0/scrape     POST      Initiated the scraping process.
+
+| Endpoint     | Method | Descrption              |
+|--------------|--------|-------------------------|
+| /v1.0/scrape | POST   | Initiates the scraping. |
+
 
 
 
