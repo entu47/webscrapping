@@ -45,12 +45,17 @@ uvicorn app:app
 | /v1.0/scrape | POST   | Initiates the scraping. |
 
 
-#### Example Request for /scrape:
+#### Example Request for /v1.0/scrape:
 
 `{
     "url":"https://dentalstall.com/shop",
     "limit": 2
 }`
-
-
-    
+#### Sample Response for /v1.0/scrape:
+* 200
+`{
+    "success": true,
+    "products_scraped": 24,
+    "products_updated": 0
+}`
+   
