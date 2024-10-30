@@ -44,18 +44,23 @@ uvicorn app:app
 |--------------|--------|-------------------------|
 | /v1.0/scrape | POST   | Initiates the scraping. |
 
+## /v1.0/scrape Endpoint Details
+### **Headers**
+* It has got two custom headers:
+  * X-Application-ID = morningstar
+  * X-Application-Token = 311E6D8D5C295512CE4BC6BBD413F
 
-#### Example Request for /v1.0/scrape:
+#### Example Request:
 
 `{
     "url":"https://dentalstall.com/shop",
     "limit": 2
 }`
-#### Sample Response for /v1.0/scrape:
+#### Sample Response:
 * 200
-`{
-    "success": true,
-    "products_scraped": 24,
-    "products_updated": 0
-}`
+   * `{
+        "success": true,
+        "products_scraped": 24,
+        "products_updated": 0
+    }`
    
