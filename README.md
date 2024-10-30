@@ -28,15 +28,15 @@ This API is built with FastAPI to scrape content from websites and store it data
 ## **Steps**
 
 1. Clone the repository:
-   1. git clone git@github.com:entu47/webscrapping.git
-   2. cd webscrapping
+   1. `git clone` git@github.com:entu47/webscrapping.git
+   2. `cd` webscrapping
 2. Install dependencies:
-   1. poetry install
+   1. `poetry install`
 
 
 # **RUNNING THE APPLICATION**
 ## **Start the FastAPI Server**
-uvicorn app:app
+`uvicorn app:app`
 
 # **API ENDPOINT**
 
